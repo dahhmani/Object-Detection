@@ -1,0 +1,15 @@
+# VS Code files
+.vscode/
+
+# Build artifacts
+build/
+venv/
+
+# Python
+*.pyc
+
+# OS X files
+.DS_Store
+
+# Project-specific files
+yolov?.weights
