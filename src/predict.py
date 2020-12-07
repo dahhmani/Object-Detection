@@ -25,13 +25,13 @@ SOFTWARE.
 import cv2 as cv
 import glob
 
-from yolo import YOLOv3
+from yolo import YOLOv3, YOLOv4
 from ssd import MobileNet_SSD
 
 def main():
 	pretrainedModelsPath = '../models'
 	
-	detector = YOLOv3(pretrainedModelsPath) # specify detection model
+	detector = YOLOv4(pretrainedModelsPath) # specify detection model
 	predict_images(detector)
 	# predict_video(detector)
 

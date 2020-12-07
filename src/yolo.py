@@ -28,6 +28,33 @@ from time import time
 
 from model import DetectionModel
 
+class YOLOv4(DetectionModel):
+	def __init__(self, pretrainedModelsPath):
+		inputResolution = (512, 512)
+		configPath = f'{pretrainedModelsPath}/YOLO/yolov4.cfg'
+		weightsPath = f'{pretrainedModelsPath}/YOLO/yolov4.weights'
+		labelsPath = f'{pretrainedModelsPath}/YOLO/coco.names'
+		self.labels = open(labelsPath).read().strip().split('\n') # COCO class labels (80 classes)
+		np.random.seed(1)
+		self.classColors = np.random.randint(0, 255, size=(len(self.labels), 3), dtype=np.uint8)
+		
+		self._loadModel(configPath, weightsPath)
+		self.net.setInputParams(size=inputResolution, scale=1.0/255, swapRB=True)
+
+	def predict(self, frame, minimumConfidence=0.5, minimumOverlap=0.3):
+		start = time()
+		classIDs, confidences, boxes = self.net.detect(frame, minimumConfidence, minimumOverlap)
+		end = time()
+		print(f'Forward pass of a single frame took {end-start:.3f} s')
+		indices = np.arange(len(boxes))
+
+		return (indices, classIDs.reshape(-1), confidences.reshape(-1), boxes)
+
+	def _loadModel(self, configPath, weightsPath):
+		self.net = cv.dnn_DetectionModel(configPath, weightsPath) # pre-trained on COCO
+		self.net.setPreferableBackend(cv.dnn.DNN_BACKEND_CUDA)
+		self.net.setPreferableTarget(cv.dnn.DNN_TARGET_CUDA)
+		
 class YOLOv3(DetectionModel):
 	def __init__(self, pretrainedModelsPath):
 		self.inputResolution = (416, 416)
